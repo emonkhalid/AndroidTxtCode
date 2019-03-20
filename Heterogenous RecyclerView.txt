@@ -1,0 +1,483 @@
+1. Example of Heterogenous RecyclerView
+Files: 1.MainActivity.java  2.
+
+
+------------MainActivity.java---------
+
+package com.example.heterogenousrecycleview;
+
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.widget.LinearLayout;
+
+import java.util.ArrayList;
+
+public class MainActivity extends AppCompatActivity {
+
+    private RecyclerView recyclerView;
+    private ArrayList<Object>objectArrayList;
+    private ObjectAdapter objectAdapter;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        recyclerView = findViewById(R.id.rv);
+        objectArrayList = new ArrayList<>();
+
+        objectArrayList.add(new Mobile("Pixel 3", "Google Pixel 3", "Google", R.drawable.mobile, 2018));
+        objectArrayList.add(new Movie("Origin of Wolverine", R.drawable.movie));
+        objectArrayList.add(new Mobile("iPhone 8", "iPhone 8x", "Apple", R.drawable.mobile, 2018));
+        objectArrayList.add(new Movie("Spiderman", R.drawable.movie));
+        objectArrayList.add(new Mobile("Pixel-3", "Google Pixel", "Google", R.drawable.mobile, 2018));
+        objectArrayList.add(new Movie("Batman", R.drawable.movie));
+        objectArrayList.add(new Movie("Titanic", R.drawable.movie));
+        objectArrayList.add(new Mobile("Mi 10", "Xiaomi Mi 10", "Xiaomi ", R.drawable.mobile, 2018));
+
+        objectAdapter = new ObjectAdapter(this, objectArrayList);
+
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+
+        recyclerView.setLayoutManager(linearLayoutManager);
+        recyclerView.setAdapter(objectAdapter);
+
+
+
+
+
+    }
+}
+
+
+
+-------------------Mobile.java-------------------
+
+package com.example.heterogenousrecycleview;
+
+import java.util.ArrayList;
+
+public class Mobile {
+
+
+    private String mobileModel;
+    private String mobileName;
+    private String mobileBrand;
+    private int mobileReleaseYear;
+    private int mobileImage;
+
+    public Mobile( String mobileModel, String mobileName, String mobileBrand, int mobileImage,  int mobileReleaseYear) {
+        this.mobileModel = mobileModel;
+        this.mobileName = mobileName;
+        this.mobileBrand = mobileBrand;
+        this.mobileImage = mobileImage;
+        this.mobileReleaseYear = mobileReleaseYear;
+    }
+
+
+    public int getMobileImage() {
+        return mobileImage;
+    }
+
+    public void setMobileImage(int mobileImage) {
+        this.mobileImage = mobileImage;
+    }
+
+    public String getMobileModel() {
+        return mobileModel;
+    }
+
+    public void setMobileModel(String mobileModel) {
+        this.mobileModel = mobileModel;
+    }
+
+    public String getMobileName() {
+        return mobileName;
+    }
+
+    public void setMobileName(String mobileName) {
+        this.mobileName = mobileName;
+    }
+
+    public String getMobileBrand() {
+        return mobileBrand;
+    }
+
+    public void setMobileBrand(String mobileBrand) {
+        this.mobileBrand = mobileBrand;
+    }
+
+
+
+    public int getMobileReleaseYear() {
+        return mobileReleaseYear;
+    }
+
+    public void setMobileReleaseYear(int mobileReleaseYear) {
+        this.mobileReleaseYear = mobileReleaseYear;
+    }
+
+    public ArrayList<Mobile>getAllMobile(){
+        ArrayList<Mobile>mobileArrayList = new ArrayList<>();
+        mobileArrayList.add(new Mobile("Pixel 3", "Google Pixel 3", "Google", R.drawable.mobile, 2018));
+        mobileArrayList.add(new Mobile("iPhone 8", "iPhone 8x", "Apple", R.drawable.mobile, 2018));
+        mobileArrayList.add(new Mobile("Pixel-3", "Google Pixel", "Google", R.drawable.mobile, 2018));
+        mobileArrayList.add(new Mobile("Note-8", "Note 8", "Samsung", R.drawable.mobile, 2018));
+        mobileArrayList.add(new Mobile("Pixel-3", "Google Pixel", "Google", R.drawable.mobile, 2018));
+        mobileArrayList.add(new Mobile("Mi 10", "Xiaomi Mi 10", "Xiaomi ", R.drawable.mobile, 2018));
+        mobileArrayList.add(new Mobile("Pixel-3", "Google Pixel", "Google", R.drawable.mobile, 2018));
+
+        return mobileArrayList;
+    }
+
+
+}
+
+
+----------------------Movie---------------------
+
+package com.example.heterogenousrecycleview;
+
+import java.util.ArrayList;
+
+public class Movie {
+
+    private String movieName;
+    private int movieImage;
+
+    public Movie(String movieName, int movieImage) {
+        this.movieName = movieName;
+        this.movieImage = movieImage;
+    }
+
+    public String getMovieName() {
+        return movieName;
+    }
+
+    public void setMovieName(String movieName) {
+        this.movieName = movieName;
+    }
+
+    public int getMovieImage() {
+        return movieImage;
+    }
+
+    public void setMovieImage(int movieImage) {
+        this.movieImage = movieImage;
+    }
+
+    public ArrayList<Movie>getAllMovies(){
+
+        ArrayList<Movie>movieArrayList = new ArrayList<>();
+        movieArrayList.add(new Movie("Origin of Wolverine", R.drawable.movie));
+        movieArrayList.add(new Movie("Spiderman", R.drawable.movie));
+        movieArrayList.add(new Movie("Origin of Wolverine", R.drawable.movie));
+        movieArrayList.add(new Movie("Batman", R.drawable.movie));
+        movieArrayList.add(new Movie("Origin of Wolverine", R.drawable.movie));
+        movieArrayList.add(new Movie("Titanic", R.drawable.movie));
+        movieArrayList.add(new Movie("Origin of Wolverine", R.drawable.movie));
+        movieArrayList.add(new Movie("Superman", R.drawable.movie));
+        movieArrayList.add(new Movie("Origin of Wolverine", R.drawable.movie));
+        movieArrayList.add(new Movie("The Mountain Mna", R.drawable.movie));
+
+        return movieArrayList;
+
+    }
+}
+
+
+-------------------------ObjectAdapter-------------------
+
+package com.example.heterogenousrecycleview;
+
+import android.content.Context;
+import android.support.annotation.NonNull;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import java.util.ArrayList;
+import java.util.zip.Inflater;
+
+public class ObjectAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+
+    private Context context;
+    private ArrayList<Object>objectArrayList;
+    private final int MOBILE_TYPE = 1;
+    private final int MOVIE_TYPE = 2;
+
+    public ObjectAdapter(Context context, ArrayList<Object> objectArrayList) {
+        this.context = context;
+        this.objectArrayList = objectArrayList;
+    }
+
+
+    @NonNull
+    @Override
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+
+        LayoutInflater layoutInflater = LayoutInflater.from(context);
+        RecyclerView.ViewHolder viewHolder = null;
+
+        switch (i){
+            case MOBILE_TYPE:
+                View v = layoutInflater.inflate(R.layout.mobile_single_row, viewGroup, false);
+                viewHolder = new MyMobileHolder(v);
+                break;
+
+            case MOVIE_TYPE:
+                View v1 = layoutInflater.inflate(R.layout.movie_single_row, viewGroup, false);
+                viewHolder = new MyMovieHolder(v1);
+                break;
+        }
+
+
+        return viewHolder;
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder viewHolder, int i) {
+
+        switch (viewHolder.getItemViewType()){
+
+            case MOBILE_TYPE:
+                MyMobileHolder mobileHolder = (MyMobileHolder) viewHolder;
+                Mobile mobile = (Mobile) objectArrayList.get(i);
+
+                mobileHolder.tvMobileModel.setText(mobile.getMobileModel());
+                mobileHolder.tvMobileName.setText(mobile.getMobileName());
+                mobileHolder.tvMobileBrand.setText(mobile.getMobileBrand());
+                mobileHolder.ivMobile.setImageResource(mobile.getMobileImage());
+                mobileHolder.tvMobileReleseYear.setText(String.valueOf(mobile.getMobileReleaseYear()));
+             break;
+
+            case MOVIE_TYPE:
+                MyMovieHolder movieHolder = (MyMovieHolder) viewHolder;
+                Movie movie = (Movie) objectArrayList.get(i);
+
+                movieHolder.ivMovie.setImageResource(movie.getMovieImage());
+                movieHolder.tvMovieName.setText(movie.getMovieName());
+            break;
+        }
+
+    }
+
+    @Override
+    public int getItemCount() {
+        return objectArrayList.size();
+    }
+
+    //This is for Mobile Object
+    class MyMobileHolder extends RecyclerView.ViewHolder  {
+
+        ImageView ivMobile;
+        TextView tvMobileModel, tvMobileName, tvMobileBrand, tvMobileReleseYear;
+
+        public MyMobileHolder(@NonNull View itemView) {
+            super(itemView);
+
+            ivMobile = itemView.findViewById(R.id.imageviewMobile);
+            tvMobileModel = itemView.findViewById(R.id.textviewMobileModel);
+            tvMobileName = itemView.findViewById(R.id.textviewMobileName);
+            tvMobileBrand = itemView.findViewById(R.id.textviewMobileBrand);
+            tvMobileReleseYear = itemView.findViewById(R.id.textviewMobileManufactureYear);
+        }
+    }
+
+
+    //This is for Movie Object
+    class MyMovieHolder extends RecyclerView.ViewHolder{
+
+        ImageView ivMovie;
+        TextView tvMovieName;
+
+        public MyMovieHolder(@NonNull View itemView) {
+            super(itemView);
+
+            ivMovie = itemView.findViewById(R.id.imageviewMovie);
+            tvMovieName = itemView.findViewById(R.id.textviewMovieName);
+        }
+    }
+
+
+    //This method send int position to onCreateViewHolder(){} as int i
+    @Override
+    public int getItemViewType(int position) {
+        if(objectArrayList.get(position) instanceof Mobile){
+            return MOBILE_TYPE;
+        }
+        else if (objectArrayList.get(position) instanceof Movie){
+            return MOVIE_TYPE;
+        }
+        return -1;
+    }
+}
+
+
+---------------------------activity_main.xml------------------
+
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rv"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:layout_editor_absoluteX="8dp"
+        tools:layout_editor_absoluteY="8dp" />
+</android.support.constraint.ConstraintLayout>
+
+
+-------------------mobile_single_row.xml---------------
+
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:elevation="9dp"
+    android:layout_margin="5dp"
+    app:cardCornerRadius="9dp"
+    app:contentPadding="3dp">
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        >
+
+        <ImageView
+            android:id="@+id/imageviewMobile"
+            android:layout_width="wrap_content"
+            android:layout_height="160dp"
+            android:src="@drawable/mobile"
+            />
+
+        <TextView
+            android:id="@+id/textviewMobileModel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Pixel"
+            android:layout_alignRight="@+id/imageviewMobile"
+            android:padding="5dp"
+            />
+        <TextView
+            android:id="@+id/textviewMobileName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignRight="@+id/imageviewMobile"
+            android:layout_below="@+id/textviewMobileModel"
+            android:text="Google Pixel 3"
+            android:padding="5dp"/>
+
+        <TextView
+            android:id="@+id/textviewMobileBrand"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignRight="@+id/imageviewMobile"
+            android:layout_below="@+id/textviewMobileName"
+            android:text="Google Pixel "
+            android:padding="5dp"
+            />
+
+        <TextView
+            android:id="@+id/textviewMobileManufactureYear"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignRight="@+id/imageviewMobile"
+            android:layout_below="@+id/textviewMobileBrand"
+            android:text="2018"
+            android:padding="5dp"
+            />
+
+
+
+    </RelativeLayout>
+
+</android.support.v7.widget.CardView>
+
+
+-----------------movie_single_row.xml-------------
+
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:elevation="9dp"
+    android:layout_margin="5dp"
+    app:cardCornerRadius="9dp"
+    app:contentPadding="3dp">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/textviewMovieName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Origin Of Wolverine"
+            android:paddingRight="15dp"/>
+
+        <ImageView
+            android:id="@+id/imageviewMovie"
+            android:layout_width="wrap_content"
+            android:layout_height="60dp"
+            android:src="@drawable/movie"
+            android:scaleType="centerCrop"/>
+
+
+
+
+    </LinearLayout>
+
+</android.support.v7.widget.CardView>
+
+------------------build.gradle---------------
+
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 28
+    defaultConfig {
+        applicationId "com.example.heterogenousrecycleview"
+        minSdkVersion 15
+        targetSdkVersion 28
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'com.android.support:appcompat-v7:28.0.0'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    implementation 'com.android.support:recyclerview-v7:28.0.0'
+    implementation 'com.android.support:cardview-v7:28.0.0'
+}
+
+
+------------------------- Inside drawable folder two images named moive.jpg and mobile.jpg will have to add.-----
