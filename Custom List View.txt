@@ -1,0 +1,206 @@
+1. Example of Custom Listview
+Files: 1. MainActivity.java  2.activity_main.xml  3.Employee.java  4.EmployeeAdapter.java  5.single_employee_row xml
+-------------MainActivity Java ----------
+
+package com.example.customadaper;
+
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.Toast;
+
+import java.util.ArrayList;
+
+public class MainActivity extends AppCompatActivity {
+
+    private ListView employeeLV;
+    private Employee employee;
+    private ArrayList<Employee>employees;
+    private EmployeeAdapter employeeAdapter;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        employeeLV = findViewById(R.id.employeeLV);
+        employee = new Employee();
+        employees = employee.getAllEmployees();
+
+        employeeAdapter = new EmployeeAdapter(this, employees);
+        employeeLV.setAdapter(employeeAdapter);
+
+        employeeLV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Toast.makeText(MainActivity.this,employees.get(position).getEmployeeName(),Toast.LENGTH_LONG).show();
+            }
+        });
+
+
+    }
+}
+
+
+----------------Employee Java ---------------
+
+package com.example.customadaper;
+
+import java.util.ArrayList;
+
+public class Employee {
+
+    private int employeeImage;
+    private String employeeName;
+    private String employeeDesignation;
+
+    public Employee(){}
+
+    public int getEmployeeImage() {
+        return employeeImage;
+    }
+
+    public void setEmployeeImage(int employeeImage) {
+        this.employeeImage = employeeImage;
+    }
+
+    public String getEmployeeName() {
+        return employeeName;
+    }
+
+    public void setEmployeeName(String employeeName) {
+        this.employeeName = employeeName;
+    }
+
+    public String getEmployeeDesignation() {
+        return employeeDesignation;
+    }
+
+    public void setEmployeeDesignation(String employeeDesignation) {
+        this.employeeDesignation = employeeDesignation;
+    }
+
+    public Employee(int employeeImage, String employeeName, String employeeDesignation) {
+        this.employeeImage = employeeImage;
+        this.employeeName = employeeName;
+        this.employeeDesignation = employeeDesignation;
+    }
+
+
+    public ArrayList<Employee> getAllEmployees(){
+        ArrayList<Employee>employees = new ArrayList<>();
+        employees.add(new Employee(R.mipmap.ic_launcher_round,"Zahid","Manager"));
+        employees.add(new Employee(R.mipmap.ic_launcher_round,"Belal","Stuff"));
+        employees.add(new Employee(R.mipmap.ic_launcher_round,"Zahid","Manager"));
+        employees.add(new Employee(R.mipmap.ic_launcher_round,"Zahid","Manager"));
+        employees.add(new Employee(R.mipmap.ic_launcher_round,"Suzon","Stuff"));
+        employees.add(new Employee(R.mipmap.ic_launcher_round,"Zahid","Manager"));
+        employees.add(new Employee(R.mipmap.ic_launcher_round,"Kazi","IT Stuff"));
+        employees.add(new Employee(R.mipmap.ic_launcher_round,"Zahid","Eng"));
+        employees.add(new Employee(R.mipmap.ic_launcher_round,"Zahid","Manager"));
+
+        return employees;
+    }
+}
+
+
+
+----------------- EmployeeAdapter Java ---------------------
+
+package com.example.customadaper;
+
+import android.content.Context;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import java.util.ArrayList;
+
+public class EmployeeAdapter extends ArrayAdapter<Employee> {
+
+    private Context context;
+    private  ArrayList<Employee>employees;
+
+    public EmployeeAdapter(Context context, ArrayList<Employee> employees) {
+
+        super(context, R.layout.single_employee_row, employees);
+
+        this.context = context;
+        this.employees = employees;
+    }
+
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+
+        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        convertView = inflater.inflate(R.layout.single_employee_row,parent,false);
+
+        ImageView empIV = convertView.findViewById(R.id.imageView);
+        TextView empName = convertView.findViewById(R.id.textView);
+        TextView empDesignation = convertView.findViewById(R.id.textView2);
+
+        empIV.setImageResource(employees.get(position).getEmployeeImage());
+        empName.setText(employees.get(position).getEmployeeName());
+        empDesignation.setText(employees.get(position).getEmployeeDesignation());
+
+        return convertView;
+    }
+}
+
+
+----------------- activity_main xml --------------
+
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <ListView
+        android:id="@+id/employeeLV"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        />
+
+</android.support.constraint.ConstraintLayout>
+
+
+----------------- single_employee_row xml-----------------
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:scaleType="centerCrop"
+        app:srcCompat="@mipmap/ic_launcher_round" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="Employee Name"
+        android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="Employee Designation"
+        android:textSize="20sp" />
+</LinearLayout>
