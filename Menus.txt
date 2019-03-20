@@ -1,0 +1,179 @@
+1. Example of Menu and Popup Menu
+Files: 1. MainActivity.java  2. activity_main.xml  3.main_menu.xml  4.floating_menu.xml  5.strings.xml
+
+-----------Java: MainActivity.java ---------------
+
+package com.example.menu;
+
+import android.graphics.Color;
+import android.support.constraint.ConstraintLayout;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.PopupMenu;
+import android.widget.Toast;
+
+public class MainActivity extends AppCompatActivity {
+
+    private boolean isLoggedIn=false;
+    private ConstraintLayout mlayout;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        mlayout = findViewById(R.id.mailLayout);
+
+    }
+
+    //Creating manu
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.main_menu,menu);
+        return true;
+    }
+
+    //Run time execution for Login and Logout
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        MenuItem loginItem = menu.findItem(R.id.login);
+        MenuItem logoutItem = menu.findItem(R.id.logout);
+        if(isLoggedIn){
+            loginItem.setVisible(false);
+            logoutItem.setVisible(true);
+        }
+        else{
+            loginItem.setVisible(true);
+            logoutItem.setVisible(false);
+        }
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    //For menu item selection
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        //return super.onOptionsItemSelected(item);
+
+        switch (item.getItemId()) {
+            case R.id.home:
+                Toast.makeText(this,"Home has been Clicked",Toast.LENGTH_LONG).show();
+                break;
+            case R.id.login:
+                isLoggedIn = true;
+                Toast.makeText(this,"Login has been Clicked",Toast.LENGTH_LONG).show();
+                break;
+            case R.id.logout:
+                isLoggedIn = false;
+                Toast.makeText(this,"Logout has been Clicked",Toast.LENGTH_LONG).show();
+                break;
+            case R.id.blueTheme:
+                mlayout.setBackgroundColor(Color.parseColor("#ADD8E6"));
+                Toast.makeText(this,"Blue Theme has been selected.",Toast.LENGTH_LONG).show();
+                break;
+            case R.id.redTheme:
+                mlayout.setBackgroundColor(Color.parseColor("#01ff90"));
+                Toast.makeText(this,"Green Theme has been selected.",Toast.LENGTH_LONG).show();
+                break;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+
+    //For Floating Menu
+    public void floadingMenu(View view){
+        PopupMenu popUpMenu = new PopupMenu(this,view);
+        MenuInflater menuInflater  = popUpMenu.getMenuInflater();
+        menuInflater.inflate(R.menu.floating_menu,popUpMenu.getMenu());
+        popUpMenu.show();
+
+    }
+}
+
+
+---------------XML: activity_main.xml------------
+
+
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mailLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="floadingMenu"
+        android:text="Floating Menu"
+        tools:layout_editor_absoluteX="73dp"
+        tools:layout_editor_absoluteY="142dp" />
+</android.support.constraint.ConstraintLayout>
+
+
+------------- Main Menu XML: main_menu.xml---------
+
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/home"
+        android:title="@string/home"
+        />
+    <item
+        android:id="@+id/login"
+        android:title="@string/login"
+        />
+
+    <item
+        android:id="@+id/logout"
+        android:title="@string/logout" />
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/blueTheme"
+            android:title="Blue Theme" />
+        <item
+            android:id="@+id/redTheme"
+            android:title="Green Theme" />
+    </group>
+
+</menu>
+
+
+------------Floating Menu File: floating_menu.xml------------
+
+
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/result"
+        android:title="Display Student By Result"
+        />
+    <item
+        android:id="@+id/department"
+        android:title="Display Student By Department"
+        />
+
+    <item
+        android:id="@+id/subject"
+        android:title="Display Student By Subject" />
+
+</menu>
+
+
+------------String File ---------
+
+<resources>
+    <string name="app_name">Menu</string>
+    <string name="home">Home</string>
+    <string name="login">Login</string>
+    <string name="logout">Logout</string>
+</resources>
