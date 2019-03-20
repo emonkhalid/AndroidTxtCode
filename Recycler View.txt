@@ -1,0 +1,323 @@
+1. Example Of RecyclerView
+Files: 1.MainActivity.java  2.TimeAdapter.java  3.TimeStamp.java  4.activity_main.xml 5.time_row.xml  
+5.popup_row_menu.xml(Inside menu folder) 6.strings.xml 7.build.gradle(Module.app)
+
+------------ 1.MainActivity.java  ------------
+
+package com.example.recyclerview;
+
+import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class MainActivity extends AppCompatActivity {
+
+    private TimeAdapter adapter;
+    private RecyclerView rv;
+    private List<TimeStamp>timeStampList = new ArrayList<>();
+    private LinearLayoutManager layoutManager;
+    private GridLayoutManager gridLayoutManager;
+    private StaggeredGridLayoutManager sgm;
+    private FloatingActionButton fab;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        rv = findViewById(R.id.timeRV);
+        fab = findViewById(R.id.addFab);
+        layoutManager = new LinearLayoutManager(this);
+        layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        //layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+        gridLayoutManager = new GridLayoutManager(this,3);
+        sgm = new StaggeredGridLayoutManager(2,StaggeredGridLayoutManager.VERTICAL);
+        //rv.setLayoutManager(layoutManager);
+        rv.setLayoutManager(sgm);
+        //rv.setLayoutManager(gridLayoutManager);
+        adapter = new TimeAdapter(this,timeStampList);
+        rv.setAdapter(adapter);
+
+
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                long time = System.currentTimeMillis();
+                TimeStamp timeStamp = new TimeStamp(String.valueOf(time));
+                timeStampList.add(timeStamp);
+                adapter.updateList(timeStampList);
+            }
+        });
+
+
+
+
+
+    }
+}
+
+
+
+--------------------------- TimeAdapter.java--------------
+
+package com.example.recyclerview;
+
+import android.content.Context;
+import android.support.annotation.NonNull;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.PopupMenu;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import java.util.List;
+
+public class TimeAdapter extends RecyclerView.Adapter<TimeAdapter.TimeHolder> {
+
+    private Context context;
+    private List<TimeStamp>timeStampList;
+
+
+    public TimeAdapter(Context context, List<TimeStamp> timeStampList) {
+        this.context = context;
+        this.timeStampList = timeStampList;
+    }
+
+    @NonNull
+    @Override
+    public TimeHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+
+        View v = LayoutInflater.from(context).inflate(R.layout.time_row, viewGroup, false);
+        return new TimeHolder(v);
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull TimeHolder timeHolder, final int i) {
+
+        timeHolder.tv.setText(timeStampList.get(i).getTimeStamp());
+        timeHolder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(context,"Position:"+ i, Toast.LENGTH_LONG).show();
+            }
+        });
+
+
+        timeHolder.tvRowMenu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+               //Toast.makeText(context,"Clicked", Toast.LENGTH_LONG).show();
+                PopupMenu popupMenu = new PopupMenu(context, v);
+                popupMenu.getMenuInflater().inflate(R.menu.popup_row_menu, popupMenu.getMenu());
+                popupMenu.show();
+
+                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+
+                        switch (item.getItemId())
+                        {
+                            case R.id.row_edit:
+                                Toast.makeText(context,"Edit Pos:"+ i, Toast.LENGTH_LONG).show();
+                                break;
+
+                            case R.id.row_delete:
+                                Toast.makeText(context,"Delete Pos:"+ i, Toast.LENGTH_LONG).show();
+                                break;
+                        }
+
+
+                        return false;
+                    }
+                });
+            }
+        });
+    }
+
+    @Override
+    public int getItemCount() {
+        return timeStampList.size();
+    }
+
+
+    public void updateList(List<TimeStamp>timeStampList){
+
+        this.timeStampList = timeStampList;
+        notifyDataSetChanged();
+    }
+
+
+    class TimeHolder extends RecyclerView.ViewHolder{
+        TextView tv,tvRowMenu;
+        public TimeHolder(@NonNull View itemView) {
+            super(itemView);
+
+            tv = itemView.findViewById(R.id.row_time);
+            tvRowMenu = itemView.findViewById(R.id.row_menu);
+        }
+    }
+}
+
+
+---------------- TimeStamp ---------------
+
+package com.example.recyclerview;
+
+public class TimeStamp {
+
+    private String timeStamp;
+
+    public TimeStamp(String timeStamp) {
+        this.timeStamp = timeStamp;
+    }
+
+    public String getTimeStamp() {
+        return timeStamp;
+    }
+
+    public void setTimeStamp(String timeStamp) {
+        this.timeStamp = timeStamp;
+    }
+}
+
+
+----------- activity_main.xml---------------
+
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/timeRV"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:layout_editor_absoluteX="290dp"
+        tools:layout_editor_absoluteY="599dp" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/addFab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0" />
+
+
+
+</android.support.constraint.ConstraintLayout>
+
+
+
+------------time_row.xml-----------------
+
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardElevation="5dp"
+    android:layout_margin="7dp"
+    android:foreground="?attr/selectableItemBackground"
+    android:clickable="true">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/row_time"
+            android:layout_width="match_parent"
+            android:layout_height="?android:listPreferredItemHeight" />
+
+        <TextView
+            android:id="@+id/row_menu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/row_menu"
+            android:textSize="30dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="8dp"/>
+
+
+    </RelativeLayout>
+
+
+</android.support.v7.widget.CardView>
+
+
+
+---------------- popup_row_menu.xml---------------------
+
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:title="Edit"
+        android:id="@+id/row_edit">
+    </item>
+    <item android:title="Delete"
+        android:id="@+id/row_delete">
+    </item>
+
+</menu>
+
+---------------------build.gradle(Module.app)-------------
+
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 28
+    defaultConfig {
+        applicationId "com.example.recyclerview"
+        minSdkVersion 15
+        targetSdkVersion 28
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'com.android.support:appcompat-v7:28.0.0'
+    implementation 'com.android.support:cardview-v7:28.0.0'
+    implementation 'com.android.support:recyclerview-v7:28.0.0'
+    implementation 'com.android.support:design:28.0.0'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    implementation 'com.android.support:recyclerview-v7:28.0.0'
+}
