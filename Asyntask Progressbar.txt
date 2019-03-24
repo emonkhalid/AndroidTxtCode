@@ -1,0 +1,100 @@
+Asyntask Progressbar Example
+Files: 1.MainActivity.java  2.activity_main.xml
+
+------------------MainActivity--------------
+
+package com.example.asyntaskexample;
+
+import android.os.AsyncTask;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.ProgressBar;
+import android.widget.Toast;
+
+public class MainActivity extends AppCompatActivity {
+
+    private ProgressBar pb;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        pb = findViewById(R.id.progressBar);
+    }
+
+
+    public void showProgress(View v){
+        new ProgressAsynTask().execute();
+    }
+
+
+    private class ProgressAsynTask extends AsyncTask<Void, Integer, Void>{
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+
+            for (int i=1; i<=10; i++){
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                publishProgress(i);
+            }
+            return null;
+        }
+
+
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            super.onProgressUpdate(values);
+            pb.setProgress(values[0]);
+
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            Toast.makeText(MainActivity.this, "Task Completed", Toast.LENGTH_LONG).show();
+        }
+    }
+
+
+}
+
+
+-------------------main.xml--------------
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity"
+    android:orientation="vertical"
+    >
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Asyntaks Example" />
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="showProgress"
+        android:paddingBottom="20dp"
+        android:text="Button" />
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+</LinearLayout>
