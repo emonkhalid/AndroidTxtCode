@@ -35,9 +35,9 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected Void doInBackground(Void... voids) {
 
-            for (int i=1; i<=10; i++){
+            for (int i=1; i<=100; i++){
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(10);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -64,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 }
+
 
 
 -------------------main.xml--------------
