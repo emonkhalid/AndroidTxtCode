@@ -1,0 +1,503 @@
+1. SQLite CRUD Example Android
+Files: 1.Employee.java  2.EmployeeDBHelper.java  3.EmployeeDBSource.java (These 3 classes inside Database package)
+4.EmployeeAdapter.java 5.EmployeeListActivity.java 6.MainActivity.java
+7.activity_main.xml  8.activity_employee_list.xml  9.employee_row.xml
+
+--------Employee.java----------
+
+package com.example.sqlite.Database;
+
+public class Employee {
+
+    private int emplopyeeId;
+    private String employeeName;
+    private String employeeDesignation;
+
+    public Employee(int emplopyeeId, String employeeName, String employeeDesignation) {
+        this.emplopyeeId = emplopyeeId;
+        this.employeeName = employeeName;
+        this.employeeDesignation = employeeDesignation;
+    }
+
+    public Employee(String employeeName, String employeeDesignation) {
+        this.employeeName = employeeName;
+        this.employeeDesignation = employeeDesignation;
+    }
+
+    public int getEmplopyeeId() {
+        return emplopyeeId;
+    }
+
+    public String getEmployeeName() {
+        return employeeName;
+    }
+
+    public String getEmployeeDesignation() {
+        return employeeDesignation;
+    }
+
+}
+
+------------------EmployeeDBHelper.java------------
+
+package com.example.sqlite.Database;
+
+import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+
+public class EmployeeDBHelper extends SQLiteOpenHelper {
+
+    private Context context;
+    public static final String DATABASE_NAME = "employee_db";
+    public static final int DATABASE_VERSION = 1;
+
+    public static final String TABLE_EMPLOYEE = "tbl_employee";
+    public static final String EMPLOYEE_COL_ID = "employee_id";
+    public static final String EMPLOYEE_COL_NAME = "employee_name";
+    public static final String EMPLOYEE_COL_DESIGNATION = "employee_designation";
+
+    public static final String CREATE_TABLE_EMPLOYEE = "CREATE TABLE "+TABLE_EMPLOYEE+"("+EMPLOYEE_COL_ID+" INTEGER PRIMARY KEY, "+
+            EMPLOYEE_COL_NAME+" TEXT, "+
+            EMPLOYEE_COL_DESIGNATION+" TEXT);";
+
+
+    public EmployeeDBHelper(Context context){
+        super(context, DATABASE_NAME, null, DATABASE_VERSION );
+
+    }
+
+    @Override
+    public void onCreate(SQLiteDatabase db) {
+        db.execSQL(CREATE_TABLE_EMPLOYEE);
+    }
+
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        db.execSQL("DROP TABLE IF EXISTS "+TABLE_EMPLOYEE);
+    }
+}
+
+-----------------EmployeeDBSource------------
+
+package com.example.sqlite.Database;
+
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+
+import java.util.ArrayList;
+
+
+public class EmployeeDBSource {
+
+    private EmployeeDBHelper dbHelper;
+    private SQLiteDatabase db;
+
+    public EmployeeDBSource(Context context) {
+        dbHelper = new EmployeeDBHelper(context);
+    }
+
+    public void open(){
+        db = dbHelper.getWritableDatabase();
+    }
+
+    public void close(){
+        db.close();
+    }
+
+    public boolean insertEmployee(Employee employee){
+        this.open();
+        ContentValues values = new ContentValues();
+        values.put(EmployeeDBHelper.EMPLOYEE_COL_NAME, employee.getEmployeeName());
+        values.put(EmployeeDBHelper.EMPLOYEE_COL_DESIGNATION, employee.getEmployeeDesignation());
+        long insertedRow = db.insert(EmployeeDBHelper.TABLE_EMPLOYEE,
+                null,
+                values);
+        if(insertedRow > 0){
+            return true;
+        }else{
+            return false;
+        }
+
+    }
+
+    public ArrayList<Employee>getAllEmployee(){
+
+        this.open();
+        ArrayList<Employee>employeeArrayList = new ArrayList<>();
+        Cursor cursor = db.query(EmployeeDBHelper.TABLE_EMPLOYEE,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null);
+        if(cursor != null && cursor.getCount() > 0){
+            cursor.moveToFirst();
+            do{
+                int id = cursor.getInt(cursor.getColumnIndex(EmployeeDBHelper.EMPLOYEE_COL_ID));
+                String name = cursor.getString(cursor.getColumnIndex(EmployeeDBHelper.EMPLOYEE_COL_NAME));
+                String designation = cursor.getString(cursor.getColumnIndex(EmployeeDBHelper.EMPLOYEE_COL_DESIGNATION));
+                employeeArrayList.add(new Employee(id, name, designation));
+            }while ( cursor.moveToNext());
+        }
+        cursor.close();
+        this.close();
+        return employeeArrayList;
+    }
+
+    public boolean deleteEmployee(int id){
+        this.open();
+        int deleteRow = db.delete(EmployeeDBHelper.TABLE_EMPLOYEE, EmployeeDBHelper.EMPLOYEE_COL_ID
+                +"="+id,null);
+        if(deleteRow > 0){
+          return true;
+        }
+        else{
+            return false;
+        }
+    }
+
+    public Employee getEmployeeById(int id){
+
+     this.open();
+     Employee employee = null;
+     Cursor cursor = db.query(EmployeeDBHelper.TABLE_EMPLOYEE,
+             null,EmployeeDBHelper.EMPLOYEE_COL_ID+"="+id,null,null,null,null);
+     if(cursor != null && cursor.getCount() > 0){
+         cursor.moveToFirst();
+         int empId = cursor.getInt(cursor.getColumnIndex(EmployeeDBHelper.EMPLOYEE_COL_ID));
+         String empName = cursor.getString(cursor.getColumnIndex(EmployeeDBHelper.EMPLOYEE_COL_NAME));
+         String empDesgination = cursor.getString(cursor.getColumnIndex(EmployeeDBHelper.EMPLOYEE_COL_DESIGNATION));
+         employee = new Employee(empId, empName, empDesgination);
+     }
+     this.close();
+     return employee;
+    }
+
+
+    public boolean updateEmployee(Employee employee){
+        this.open();
+        ContentValues values = new ContentValues();
+        values.put(EmployeeDBHelper.EMPLOYEE_COL_NAME, employee.getEmployeeName());
+        values.put(EmployeeDBHelper.EMPLOYEE_COL_DESIGNATION, employee.getEmployeeDesignation());
+        int updatedRow = db.update(EmployeeDBHelper.TABLE_EMPLOYEE,
+                values,
+                EmployeeDBHelper.EMPLOYEE_COL_ID+"="+employee.getEmplopyeeId(),
+                null
+                );
+
+        if(updatedRow >0){
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+
+}
+------------ These 3 files inside Database package--------------
+----------- EmployeeAdapter.java--------
+
+package com.example.sqlite;
+
+import android.content.Context;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.TextView;
+
+import com.example.sqlite.Database.Employee;
+
+import java.util.ArrayList;
+
+public class EmployeeAdapter extends ArrayAdapter<Employee> {
+
+    private Context context;
+    private ArrayList<Employee>employeeArrayList;
+
+    public EmployeeAdapter(Context context, ArrayList<Employee>employeeArrayList) {
+        super(context, R.layout.employee_row, employeeArrayList);
+
+        this.context = context;
+        this.employeeArrayList = employeeArrayList;
+    }
+
+
+
+    @Override
+    public View getView(int position, View convertView,  ViewGroup parent) {
+
+        LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        convertView = layoutInflater.inflate(R.layout.employee_row, parent, false);
+
+        TextView nameTV = convertView.findViewById(R.id.textviewEmployeeName);
+        TextView designationTV = convertView.findViewById(R.id.textviewEmployeeDesignation);
+
+        nameTV.setText(employeeArrayList.get(position).getEmployeeName());
+        designationTV.setText(employeeArrayList.get(position).getEmployeeDesignation());
+        return convertView;
+    }
+}
+
+------------------EmployeeListActivity---------------
+
+package com.example.sqlite;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ListView;
+
+import com.example.sqlite.Database.Employee;
+import com.example.sqlite.Database.EmployeeDBSource;
+
+import java.util.ArrayList;
+
+public class EmployeeListActivity extends AppCompatActivity {
+
+    private ListView listView;
+    private EmployeeAdapter employeeAdapter;
+    private ArrayList<Employee> employeeArrayList = new ArrayList<>();
+    private EmployeeDBSource source;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_employee_list);
+
+        listView = findViewById(R.id.employeeListView);
+
+        source = new EmployeeDBSource(this);
+        employeeArrayList = source.getAllEmployee();
+        employeeAdapter = new EmployeeAdapter(this,employeeArrayList);
+        listView.setAdapter(employeeAdapter);
+
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+
+                int employeeId = employeeArrayList.get(position).getEmplopyeeId();
+                source.deleteEmployee(employeeId);
+                reloadActivity();
+                return false;
+            }
+        });
+        //For Edit Function
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Employee  employee = employeeArrayList.get(position);
+                int empId = employee.getEmplopyeeId();
+                startActivity( new Intent(EmployeeListActivity.this, MainActivity.class)
+                        .putExtra("empId", empId));
+
+
+            }
+        });
+
+
+
+
+    }
+
+    private void reloadActivity(){
+        startActivity(new Intent(this, EmployeeListActivity.class));
+    }
+
+}
+
+-------------------------MainActivity------------------
+
+package com.example.sqlite;
+
+
+import android.content.Intent;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
+
+import com.example.sqlite.Database.Employee;
+import com.example.sqlite.Database.EmployeeDBSource;
+
+public class MainActivity extends AppCompatActivity {
+
+    private EmployeeDBSource employeeDBSource;
+    private int empId;
+
+    Button btnSave;
+    EditText etEmpName, etEmpDesignation;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        etEmpName = findViewById(R.id.edit_textEmployeeName);
+        etEmpDesignation = findViewById(R.id.edit_textEmployeeDesignation);
+        btnSave = findViewById(R.id.buttonSaveEmployee);
+
+        employeeDBSource = new EmployeeDBSource(this);
+        empId = getIntent().getIntExtra("empId", 0);
+
+        if(empId > 0){
+            Employee employee = employeeDBSource.getEmployeeById(empId);
+            etEmpName.setText(employee.getEmployeeName());
+            etEmpDesignation.setText(employee.getEmployeeDesignation());
+            btnSave.setText("Update");
+
+        }
+
+
+    }
+
+
+
+    public void createEmployeeBtn(View v){
+
+        if( empId > 0){
+            String empName = etEmpName.getText().toString();
+            String empDesignation = etEmpDesignation.getText().toString();
+
+            Employee employee = new Employee(empId, empName, empDesignation);
+            boolean status = employeeDBSource.updateEmployee(employee);
+            if(status){
+                Toast.makeText(this,"Updated Successfully", Toast.LENGTH_LONG).show();
+            }else{
+                Toast.makeText(this,"Failed to Update!", Toast.LENGTH_LONG).show();
+            }
+        }
+
+        else{
+            String empName = etEmpName.getText().toString();
+            String empDesignation = etEmpDesignation.getText().toString();
+
+            Employee employee = new Employee(empName, empDesignation);
+            EmployeeDBSource employeeDBSource = new EmployeeDBSource(this);
+            boolean status = employeeDBSource.insertEmployee(employee);
+            if(status){
+                Toast.makeText(this,"Employee Created Successfully", Toast.LENGTH_LONG).show();
+            }else{
+                Toast.makeText(this,"Sorry, Employee Created Failed!", Toast.LENGTH_LONG).show();
+            }
+        }
+
+    }
+
+
+    public void viewEmployeeBtn(View v){
+        startActivity(new Intent(MainActivity.this, EmployeeListActivity.class));
+
+    }
+
+
+}
+
+----------------------- activity_employee_list.xml -------
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context=".EmployeeListActivity"
+    tools:showIn="@layout/activity_employee_list">
+
+    <ListView
+        android:id="@+id/employeeListView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    </ListView>
+
+</LinearLayout>
+
+-------------- activity_main.xml ---------
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <EditText
+            android:id="@+id/edit_textEmployeeName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Enter Name" />
+
+        <EditText
+            android:id="@+id/edit_textEmployeeDesignation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Enter Designation" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/buttonSaveEmployee"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="createEmployeeBtn"
+            android:text="Create" />
+
+
+        <Button
+            android:id="@+id/buttonViewEmployee"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="viewEmployeeBtn"
+            android:text="View Employees" />
+
+
+    </LinearLayout>
+
+</LinearLayout>
+
+---------------- employee_row.xml ----------------
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="?android:listPreferredItemHeight"
+    >
+
+    <TextView
+        android:id="@+id/textviewEmployeeName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/textviewEmployeeDesignation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>
